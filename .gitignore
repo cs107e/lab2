@@ -39,6 +39,7 @@
 # And binaries
 !libgcc.a
 !libpi.a
+!libpisd.a
 !libpi/modules/*.o
 
 # Mac
