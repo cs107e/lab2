@@ -3,66 +3,63 @@
 // C examples that demo some interesting properties/transformations
 // when C compiler generates ARM instructions.
 
-// Note: each function begins with a goofy statement that 
-// initializes a variable to a value read from memory.
+// Note: some passages set a variable from an (uninitialized) global.
 // If instead we had init to a constant, gcc is so smart that
 // it will optimize away the rest of the work, so this
-// is here to trick the compiler to treat as "random" value
+// is here to trick the compiler to treat as unknown. 
 
-
+int global;
 
 // Part (a): arithmetic
 // Study each of the C statements and the translation to ARM assembly
 // line 1: ARM has no negate instruction -- what is used instead?
 // line 2: What is used in place of multiply for this expression?
 // line 3: Note that some parts of the complex arithmetic expression 
-// is pre-computed by the compiler, and other parts are not. 
+// are pre-computed by the compiler, and other parts are not. 
 // Why the difference?  Change the initialization of num to
 // a constant value, e.g. int num = 3. Now how much of the
 // expression is the compiler able to precompute?
-int part_a(void)
+void part_a(void)
 {
-    int num = *(int *)100;
+    int num = global;
 
     num = -num;
     num = 5 * num;
     num =  (num & ~(-1 << 4)) * (((12*18 - 1)/2) + num); 
-    return num;
+    global = num;
 }
 
 // Part (b): if/else
-// An if/else can be implemented in assembly as two distinct code 
-// paths and a control flow that routes to one path or the other 
-// using branch. Alternatively, it could be expressed as one combined 
-// sequence of conditionally executed instructions.
-// First, review the generated assembly when compiled with flag -Og
-// (lightly optimized). Now change flag -Og to -O1 (more optimized)
-// and review how the generated assembly changes.
-// Count the instructions in the two versions and you'll see 
-// there are 6 executed for -Og (if either branch is taken) and the
-// same for -O1. Can you come up with a theory to explain the
-// performance advantage of the -O1 version despite executing the
-// same number of instructions?
-int part_b(void)
+// An if/else is typically implemented in assembly as two
+// distinct code paths and a control flow that routes to one 
+// path or the other using branch. However, compiling the
+// code below as-is shows that for a short if-then-else,
+// gcc prefers use of one combined sequence of conditionally
+// executed instructions to avoid the (expensive) branch.
+// Edit the code to add further statements in the body of the 
+// "then" to find out how long the sequence has to be to
+// cause gcc to rewrite into the more tranditional branch form.
+void part_b(void)
 {
-    int num = *(int *)100;
+    int num = global;
 
     if (num < 0) {
         num++;
     } else {
         num--;
     }  
-    return num;
+    global = num;
 } 
 
 // Part (c): loops
 // This function is a C version of the delay loop we used in
-// the blink program.  When using flag -Og or -O1,
+// the blink program.  When using flag -Og,
 // the compiler's generated assembly is a close match to our
-// hand-written assembly. But if you notch it up to -O2
+// hand-written assembly. But if you change flags to -O2
 // (aggressive optimization), the generated assembly is
 // significantly different. Why? What can you change in the
-// C code to prevent that undesired transformation?
+// C code to prevent that undesired transformation, even at
+// an aggressive level of optimization?
 void part_c(void)
 {
     int delay = 0x3f00;
@@ -76,22 +73,22 @@ void part_c(void)
 // (such as adding a typecast, or operating on pointer of 
 // different pointee type). How do those differences affect
 // the generated assembly? 
-int part_d(void)
+void part_d(void)
 {
-    int *ptr = 0;
+    int *ptr = &global;
     char *cptr = 0;
-    int n = *ptr;
+    int val = 107;
+    int n = global;
 
-    *ptr = 23;      // compare to next ine
-    *(char *)ptr = 23;
+    *ptr = val;      // compare to next ine
+    *(char *)ptr = val;
 
-    ptr[10] = 15;   // compare to next line
-    cptr[10] = 15;
+    ptr[10] = val;   // compare to next line
+    cptr[10] = val;
 
     n = *(ptr + n); // compare to next line
     n = ptr[n];
-
-    return n;
+    global = n;
 }
 
 
