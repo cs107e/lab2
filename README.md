@@ -361,7 +361,7 @@ them; keeping track of what parts of the program work and what parts don't is es
 to debugging effectively. Starting with assignment 2, we'll provide you with some 
 automated tests and tools you can use to write your own tests.
 
-The standard C library contains an `aasert` macro for use as a simple diagnostic. Run the command `man assert` in your Terminal to read about the standard library version. The `assert` macro takes an expression that is expected to evaluate to true. If the expression is, in fact, true, then the assertion succeeds and the program continues on.  If the expression is false, the assertion fails and raises an error.
+The standard C library contains an `assert` macro for use as a simple diagnostic. Run the command `man assert` in your Terminal to read about the standard library version. The `assert` macro takes an expression that is expected to evaluate to true. If the expression is, in fact, true, then the assertion succeeds and the program continues on.  If the expression is false, the assertion fails and raises an error.
 
 Running bare metal means no standard libraries, and furthermore don't have printf (yet!), so if we want something akin to assert, we are going to have to cons it up ourselves using whatever resources we have on hand. In the lab2 code, we have supplied a primitive  `assert` that uses the red and green LEDs on board the Pi to signal success and failure.
 
