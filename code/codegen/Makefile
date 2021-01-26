@@ -6,7 +6,7 @@
 
 CFLAGS = -g -Wall -Og -std=c99 -ffreestanding
 
-all : codegen.list 
+all : codegen.list
 
 %.o: %.c
 	arm-none-eabi-gcc $(CFLAGS) -c $< -o $@
@@ -18,3 +18,4 @@ clean:
 	rm -f *.o *.bin *.elf *.list
 
 .PHONY: all clean
+.PRECIOUS: %.o

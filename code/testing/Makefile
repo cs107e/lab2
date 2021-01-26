@@ -1,6 +1,6 @@
 #
 # A simple makefile for building program composed of C/asm source files.
-# Builds for ARM target using cross-development toolchain. 
+# Builds for ARM target using cross-development toolchain.
 
 NAME = testing
 
@@ -13,7 +13,7 @@ all : $(NAME).bin
 %.bin: %.elf
 	arm-none-eabi-objcopy $< -O binary $@
 
-%.elf: abort.o %.o start.o cstart.o
+%.elf: %.o start.o cstart.o
 	arm-none-eabi-gcc $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 %.o: %.c
